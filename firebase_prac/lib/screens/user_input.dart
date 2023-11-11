@@ -1,4 +1,5 @@
 import 'package:firebase_prac/screens/skill_screen.dart';
+import 'package:firebase_prac/screens/skilled_in.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_prac/main.dart';
@@ -124,7 +125,7 @@ class _UserInputFormState extends State<UserInputForm> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        'Choose Date',
+                        'Choose Date of Birth',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 25.0,
@@ -142,6 +143,8 @@ class _UserInputFormState extends State<UserInputForm> {
                 numberController.text = number.phoneNumber.toString();
                 //phone = number.toString();
               },
+
+              maxLength: 11,
               inputDecoration: InputDecoration(
                 labelText: "Phone Number",
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0)),
@@ -181,7 +184,7 @@ class _UserInputFormState extends State<UserInputForm> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => SkillScreen(),
+                    builder: (context) => SkilledInScreen(),
                   ),
                 );
 

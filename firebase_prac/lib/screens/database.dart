@@ -93,6 +93,52 @@ class DatabaseMethods {
     }
   }
 
+  Future<List<Map<String, dynamic>>?> getSkilledCategories(
+      String userId) async {
+    try {
+      final categoriesCollection = FirebaseFirestore.instance
+          .collection("user_info")
+          .doc(userId)
+          .collection("skilled_in");
+
+      final categoriesSnapshot = await categoriesCollection.get();
+
+      return categoriesSnapshot.docs
+          .map((doc) => {
+        'name': doc.get('name'),
+        'isChecked': doc.get('isChecked'),
+      })
+          .toList();
+    } catch (e) {
+      print('Error fetching selected categories: $e');
+      return null;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>?> getUnskilledCategories(
+      String userId) async {
+    try {
+      final categoriesCollection = FirebaseFirestore.instance
+          .collection("user_info")
+          .doc(userId)
+          .collection("unskilled_in");
+
+      final categoriesSnapshot = await categoriesCollection.get();
+
+      return categoriesSnapshot.docs
+          .map((doc) => {
+        'name': doc.get('name'),
+        'isChecked': doc.get('isChecked'),
+      })
+          .toList();
+    } catch (e) {
+      print('Error fetching selected categories: $e');
+      return null;
+    }
+  }
+
+
+
   // Function to add user's location to Firestore as a GeoPoint
   Future<void> addUserLocation(String userId, double latitude, double longitude) async {
     final userRef = FirebaseFirestore.instance.collection("user_info").doc(userId);

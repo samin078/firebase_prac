@@ -101,6 +101,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     Fluttertoast.showToast(
                         msg: 'Error',
                     );
+                    setState(() {
+                      showSpinner = false;
+                    });
                   }
                 },
               ),

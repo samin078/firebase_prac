@@ -21,22 +21,47 @@ class ResultScreen extends StatefulWidget {
 class _ResultScreenState extends State<ResultScreen> {
 
   String location = "User's location";
-  List<Map> selectedCategories = [];
+  List<Map> skilledCategories = [];
+  List<Map> unskilledCategories = [];
 
-  Future<void> fetchSelectedCategories(String userId) async {
+  // Future<void> fetchSkilledCategories(String userId) async {
+  //   try {
+  //     final categoriesCollection = FirebaseFirestore.instance
+  //         .collection("user_info")
+  //         .doc(userId)
+  //         .collection("skilled_in");
+  //
+  //     final QuerySnapshot categoriesSnapshot = await categoriesCollection.get();
+  //
+  //     skilledCategories = categoriesSnapshot.docs
+  //         .map((doc) => {
+  //               "name": doc.get("name"),
+  //               "isChecked": doc.get("isChecked"),
+  //             })
+  //         .toList();
+  //
+  //     setState(() {
+  //       // Trigger a rebuild of the UI with the fetched data
+  //     });
+  //   } catch (e) {
+  //     print('Error fetching selected categories: $e');
+  //   }
+  // }
+
+  Future<void> fetchUnskilledCategories(String userId) async {
     try {
       final categoriesCollection = FirebaseFirestore.instance
           .collection("user_info")
           .doc(userId)
-          .collection("categories");
+          .collection("unskilled_in");
 
       final QuerySnapshot categoriesSnapshot = await categoriesCollection.get();
 
-      selectedCategories = categoriesSnapshot.docs
+      unskilledCategories = categoriesSnapshot.docs
           .map((doc) => {
-                "name": doc.get("name"),
-                "isChecked": doc.get("isChecked"),
-              })
+        "name": doc.get("name"),
+        "isChecked": doc.get("isChecked"),
+      })
           .toList();
 
       setState(() {
@@ -46,6 +71,7 @@ class _ResultScreenState extends State<ResultScreen> {
       print('Error fetching selected categories: $e');
     }
   }
+
 
   // Define a function to fetch user data
   Future<void> fetchUserData() async {
@@ -94,7 +120,8 @@ class _ResultScreenState extends State<ResultScreen> {
     });
 
     fetchUserData();
-    fetchSelectedCategories(userId!);
+    //fetchSkilledCategories(userId!);
+    fetchUnskilledCategories(userId!);
     super.initState();
   }
 
@@ -116,7 +143,7 @@ class _ResultScreenState extends State<ResultScreen> {
         final userData = userSnapshot.data;
 
         return FutureBuilder<List<Map<String, dynamic>>?>(
-          future: DatabaseMethods().getSelectedCategories(userId!),
+          future: DatabaseMethods().getSkilledCategories(userId!),
           builder: (context, categoriesSnapshot) {
             if (categoriesSnapshot.connectionState == ConnectionState.waiting) {
               return Center(
@@ -128,7 +155,7 @@ class _ResultScreenState extends State<ResultScreen> {
               return Text('Error: ${categoriesSnapshot.error}');
             }
 
-            final selectedCategories = categoriesSnapshot.data ?? [];
+            final skilledCategories = categoriesSnapshot.data ?? [];
 
             return Scaffold(
               appBar: AppBar(
@@ -161,14 +188,32 @@ class _ResultScreenState extends State<ResultScreen> {
                     ),
                     Divider(),
                     Text(
-                      "Selected Categories:",
+                      "Skilled Categories:",
                       style: TextStyle(fontSize: 18),
                     ),
                     ListView.builder(
                       shrinkWrap: true,
-                      itemCount: selectedCategories.length,
+                      itemCount: skilledCategories.length,
                       itemBuilder: (context, index) {
-                        final category = selectedCategories[index];
+                        final category = skilledCategories[index];
+                        return ListTile(
+                          title: Text(category['name']),
+                          subtitle: Text(
+                            category['isChecked'] ? 'Selected' : 'Not Selected',
+                          ),
+                        );
+                      },
+                    ),
+                    Divider(),
+                    Text(
+                      "Interested Categories:",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: unskilledCategories.length,
+                      itemBuilder: (context, index) {
+                        final category = unskilledCategories[index];
                         return ListTile(
                           title: Text(category['name']),
                           subtitle: Text(

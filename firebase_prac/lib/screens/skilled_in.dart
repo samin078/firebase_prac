@@ -1,22 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_prac/screens/database.dart';
-//import 'package:firebase_prac/screens/result_screen.dart';
+import 'package:firebase_prac/screens/unskilled_in.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../location/userLocation.dart';
 
+
 var userId = DatabaseMethods.userId;
 
-class SkillScreen extends StatefulWidget {
-  static String id = 'skill_screen';
+class SkilledInScreen extends StatefulWidget {
 
-  const SkillScreen({Key? key}) : super(key: key);
+  static String id = 'skilled_in_screen';
+
+  const SkilledInScreen({Key? key}) : super(key: key);
 
   @override
-  State<SkillScreen> createState() => _SkillScreenState();
+  State<SkilledInScreen> createState() => _SkilledInScreenState();
 }
 
-class _SkillScreenState extends State<SkillScreen> {
+class _SkilledInScreenState extends State<SkilledInScreen> {
   List<Map> categories = [
     {"name": "Math", "isChecked": false},
     {"name": "Physics", "isChecked": false},
@@ -64,7 +66,7 @@ class _SkillScreenState extends State<SkillScreen> {
 
 // Define a reference to the Firestore collection
   final CollectionReference categoriesCollection =
-      FirebaseFirestore.instance.collection('categories');
+  FirebaseFirestore.instance.collection('categories');
 
 // Function to add categories to Firestore
   Future<void> addCategoriesToFirestore(List<Map> Categories) async {
@@ -86,7 +88,7 @@ class _SkillScreenState extends State<SkillScreen> {
     try {
       final userRef =
       FirebaseFirestore.instance.collection("user_info").doc(userId);
-      final categoriesCollection = userRef.collection("categories");
+      final categoriesCollection = userRef.collection("skilled_in");
       final QuerySnapshot querySnapshot = await categoriesCollection
           .where("name", isEqualTo: skillName)
           .get();
@@ -104,8 +106,8 @@ class _SkillScreenState extends State<SkillScreen> {
       List<Map> categories, String userId) async {
     try {
       final userRef =
-          FirebaseFirestore.instance.collection("user_info").doc(userId);
-      final categoriesCollection = userRef.collection("categories");
+      FirebaseFirestore.instance.collection("user_info").doc(userId);
+      final categoriesCollection = userRef.collection("skilled_in");
 
       for (var category in categories) {
         await categoriesCollection.add({
@@ -126,7 +128,7 @@ class _SkillScreenState extends State<SkillScreen> {
       appBar: AppBar(
         title: Column(
           children: const [
-            Text('Checkboxes'),
+            Text('Skilled In'),
           ],
         ),
         centerTitle: true,
@@ -146,18 +148,18 @@ class _SkillScreenState extends State<SkillScreen> {
               const SizedBox(height: 10),
               Column(
                   children: categories.map((favorite) {
-                return CheckboxListTile(
-                    activeColor: Colors.deepPurpleAccent,
-                    checkboxShape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5)),
-                    value: favorite["isChecked"],
-                    title: Text(favorite["name"]),
-                    onChanged: (val) {
-                      setState(() {
-                        favorite["isChecked"] = val;
-                      });
-                    });
-              }).toList()),
+                    return CheckboxListTile(
+                        activeColor: Colors.deepPurpleAccent,
+                        checkboxShape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5)),
+                        value: favorite["isChecked"],
+                        title: Text(favorite["name"]),
+                        onChanged: (val) {
+                          setState(() {
+                            favorite["isChecked"] = val;
+                          });
+                        });
+                  }).toList()),
               const SizedBox(height: 10),
               const Divider(),
               const SizedBox(height: 10),
@@ -183,7 +185,7 @@ class _SkillScreenState extends State<SkillScreen> {
                               onTap: () {
                                 setState(() {
                                   favorite["isChecked"] =
-                                      !favorite["isChecked"];
+                                  !favorite["isChecked"];
                                 });
                               },
                               child: const Icon(
@@ -209,10 +211,13 @@ class _SkillScreenState extends State<SkillScreen> {
                     if (category["isChecked"]) {
                       final skillName = category["name"];
                       print(skillName.toString());
-                      final skillExists = await skillExistsInDatabase(skillName);
+                      final skillExists = await skillExistsInDatabase(
+                          skillName);
                       print(skillExists.toString());
-                      final skillExistsInSelectedCategories = selectedCategories.any(
-                            (selectedCategory) => selectedCategory["name"] == skillName,
+                      final skillExistsInSelectedCategories = selectedCategories
+                          .any(
+                            (selectedCategory) =>
+                        selectedCategory["name"] == skillName,
                       );
 
                       if (!skillExists && !skillExistsInSelectedCategories) {
@@ -220,13 +225,12 @@ class _SkillScreenState extends State<SkillScreen> {
                       }
                     }
                   }
-
                   //showToast("Skills Added", 2);
                   print('Selected Categories: $selectedCategories');
                   // Pass the user's ID (userId) obtained from the constructor
                   addSelectedCategoriesToFirestore(
                       selectedCategories, userId.toString());
-                  Navigator.pushNamed(context, Location.id);
+                  Navigator.pushNamed(context, UnskilledInScreen.id);
                 },
                 child: Text("Submit"),
               ),

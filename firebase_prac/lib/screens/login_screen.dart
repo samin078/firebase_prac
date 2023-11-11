@@ -96,6 +96,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     Fluttertoast.showToast(
                       msg: "$e",
                     );
+                    setState(() {
+                      showSpinner = false;
+                    });
                   }
                 },
               ),

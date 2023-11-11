@@ -9,6 +9,8 @@ import 'package:firebase_prac/screens/registration_screen.dart';
 import 'package:firebase_prac/screens/result_screen.dart';
 import 'package:firebase_prac/screens/skill_list.dart';
 import 'package:firebase_prac/screens/skill_screen.dart';
+import 'package:firebase_prac/screens/skilled_in.dart';
+import 'package:firebase_prac/screens/unskilled_in.dart';
 import 'package:firebase_prac/screens/welcome_screen.dart';
 import 'package:firebase_prac/unused/skills_screen.dart';
 import 'package:firebase_prac/screens/user_info.dart';
@@ -56,6 +58,8 @@ class MyApp extends StatelessWidget {
         ResultScreen.id: (context) => ResultScreen(),
         Location.id: (context) => Location(),
         MapPage.id: (context) => MapPage(),
+        SkilledInScreen.id: (context) => SkilledInScreen(),
+        UnskilledInScreen.id: (context) => UnskilledInScreen(),
       },
     );
   }
