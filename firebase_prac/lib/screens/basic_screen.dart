@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dart_geohash/dart_geohash.dart';
 import 'package:firebase_prac/components/reusable_card.dart';
+import 'package:firebase_prac/screens/user_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_prac/screens/database.dart';
 import 'package:geolocator/geolocator.dart';
@@ -126,6 +127,15 @@ class _BasicScreenState extends State<BasicScreen> {
   Map<String, List<String>> nearbyUserSkilledCategories = {};
   Map<String, List<String>> nearbyUsersLearnCategories = {};
 
+  void _navigateToUserDetailScreen(String userId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UserDetailedScreen(userId: userId),
+      ),
+    );
+  }
+
   Future<void> fetchNearbyUsers(double searchRadius) async {
     // Create a Firestore collection reference to your users
     CollectionReference usersCollection =
@@ -175,6 +185,13 @@ class _BasicScreenState extends State<BasicScreen> {
                 .intersection(nearbyUnskilledCategories.toSet())
                 .toList();
             print(commonTeachCategories);
+
+            if(commonTeachCategories.isEmpty){
+              nearbyUserUnskilledCategories.remove(nuserId);
+              commonTeachCategories.remove(nuserId);
+            }
+
+
           }
 
           List<String>? nearbySkilledCategories =
@@ -207,6 +224,7 @@ class _BasicScreenState extends State<BasicScreen> {
     // Update the UI with nearby user data
     setState(() {
       nearbyUsers = nearbyUsersMap;
+      print(nearbyUsers);
     });
   }
 
@@ -245,124 +263,130 @@ class _BasicScreenState extends State<BasicScreen> {
           itemCount: nearbyUserUnskilledCategories.length,
           itemBuilder: (context, index) {
             final userId = nearbyUserUnskilledCategories.keys.elementAt(index);
+            //final userId = nearbyUsers[index];
             final usersUnskilledCategories =
                 nearbyUserUnskilledCategories[userId];
             final commonTeachCategories = nearbyUsersTeachCategories[userId];
             final usersSkilledCategories = nearbyUserSkilledCategories[userId];
             final commonLearnCategories = nearbyUsersLearnCategories[userId];
 
-            return Container(
-              margin: EdgeInsets.all(10.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.0),
-                color: Colors.blueGrey[100],
-              ),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 5.0, horizontal: 0.0),
-                child: ListTile(
-                  minLeadingWidth: 2.0,
-                  trailing: Icon(
-                    Icons.ac_unit,
-                    size: 20.0,
-                  ),
-                  // leading: Container(
-                  //   height: double.infinity,
-                  //   // alignment: Alignment.centerLeft,
-                  //   child: Icon(
-                  //     Icons.ac_unit,
-                  //     size: 40.0,
-                  //   ),
-                  // ),
-                  title: Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.abc,
-                          size: 35.0,
-                        ),
-                        SizedBox(
-                          width: 15.0,
-                        ),
-                        Text(
-                          'UserName',
-                          style: TextStyle(
-                            fontSize: 22.0,
+            return InkWell(
+              onTap: () {
+                _navigateToUserDetailScreen(userId);
+              },
+              child: Container(
+                margin: EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  color: Colors.blueGrey[100],
+                ),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 5.0, horizontal: 0.0),
+                  child: ListTile(
+                    minLeadingWidth: 2.0,
+                    trailing: Icon(
+                      Icons.ac_unit,
+                      size: 20.0,
+                    ),
+                    // leading: Container(
+                    //   height: double.infinity,
+                    //   // alignment: Alignment.centerLeft,
+                    //   child: Icon(
+                    //     Icons.ac_unit,
+                    //     size: 40.0,
+                    //   ),
+                    // ),
+                    title: Container(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.abc,
+                            size: 35.0,
                           ),
+                          SizedBox(
+                            width: 15.0,
+                          ),
+                          Text(
+                            'UserName',
+                            style: TextStyle(
+                              fontSize: 22.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // subtitle: Column(
+                    //   crossAxisAlignment: CrossAxisAlignment.start,
+                    //   children: [
+                    //     Text(
+                    //         'Interested Categories: ${usersUnskilledCategories?.join(', ') ?? ''}'),
+                    //     Text(
+                    //         'Matched Categories: ${commonTeachCategories?.join(', ') ?? ''}'),
+                    //     Text(
+                    //         'Skilled Categories: ${usersSkilledCategories?.join(', ') ?? ''}'),
+                    //     Text(
+                    //         'Matched Categories: ${commonLearnCategories?.join(', ') ?? ''}'),
+                    //   ],
+                    // ),
+                    subtitle: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Container(
+                          child: Column(
+                            children: [
+                              Text(
+                                'Skilled In',
+                                style: TextStyle(
+                                  fontSize: 18.0,
+                                ),
+                              ),
+                              Text(
+                                '${usersSkilledCategories?.join('\n') ?? ''}',
+                              ),
+                              Text(
+                                'Matched',
+                                style: TextStyle(
+                                  fontSize: 18.0,
+                                ),
+                              ),
+                              Text(
+                                '${commonLearnCategories?.join('\n') ?? ''}',
+                              ),
+                            ],
+                          ),
+                        ),
+                        VerticalDivider(
+                          color: Colors.black45,
+                          thickness: 2,
+                        ),
+                        Container(
+                          child: Column(
+                            children: [
+                              Text(
+                                'Interested In',
+                                style: TextStyle(
+                                  fontSize: 18.0,
+                                ),
+                              ),
+                              Text(
+                                '${usersUnskilledCategories?.join('\n') ?? ''}',
+                              ),
+                              Text(
+                                'Matched',
+                                style: TextStyle(
+                                  fontSize: 18.0,
+                                ),
+                              ),
+                              Text(
+                                '${commonTeachCategories?.join('\n') ?? ''}',
+                              ),
+                            ],
+                          )
                         ),
                       ],
                     ),
-                  ),
-                  // subtitle: Column(
-                  //   crossAxisAlignment: CrossAxisAlignment.start,
-                  //   children: [
-                  //     Text(
-                  //         'Interested Categories: ${usersUnskilledCategories?.join(', ') ?? ''}'),
-                  //     Text(
-                  //         'Matched Categories: ${commonTeachCategories?.join(', ') ?? ''}'),
-                  //     Text(
-                  //         'Skilled Categories: ${usersSkilledCategories?.join(', ') ?? ''}'),
-                  //     Text(
-                  //         'Matched Categories: ${commonLearnCategories?.join(', ') ?? ''}'),
-                  //   ],
-                  // ),
-                  subtitle: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Container(
-                        child: Column(
-                          children: [
-                            Text(
-                              'Skilled In',
-                              style: TextStyle(
-                                fontSize: 18.0,
-                              ),
-                            ),
-                            Text(
-                              '${usersSkilledCategories?.join('\n') ?? ''}',
-                            ),
-                            Text(
-                              'Matched',
-                              style: TextStyle(
-                                fontSize: 18.0,
-                              ),
-                            ),
-                            Text(
-                              '${commonLearnCategories?.join('\n') ?? ''}',
-                            ),
-                          ],
-                        ),
-                      ),
-                      VerticalDivider(
-                        color: Colors.black45,
-                        thickness: 2,
-                      ),
-                      Container(
-                        child: Column(
-                          children: [
-                            Text(
-                              'Interested In',
-                              style: TextStyle(
-                                fontSize: 18.0,
-                              ),
-                            ),
-                            Text(
-                              '${usersUnskilledCategories?.join('\n') ?? ''}',
-                            ),
-                            Text(
-                              'Matched',
-                              style: TextStyle(
-                                fontSize: 18.0,
-                              ),
-                            ),
-                            Text(
-                              '${commonTeachCategories?.join('\n') ?? ''}',
-                            ),
-                          ],
-                        )
-                      ),
-                    ],
                   ),
                 ),
               ),
